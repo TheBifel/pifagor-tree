@@ -17,9 +17,10 @@ import static java.lang.StrictMath.sqrt;
 class Main {
 
    private static ArrayList<int[]> linesToDraw = new ArrayList<>();
-   private static int size = 70;
-   private static Double delta = 0.5;
-   private static Double angle = 15.0;
+   private static int size = 100;
+   private static int stop = 15;
+   private static Double delta = (double) 0.5;
+   private static Double angle = (double) 20;
 
     public static void main(String[] args) {
 
@@ -32,30 +33,25 @@ class Main {
         int[] lastLine = new int[] {0, 0, 0, size};
         linesToDraw.add(lastLine);
         int step = 1;
-        while (lastLine[3] != 0){
-            lastLine = createLine(step, lastLine, 1);
-            linesToDraw.add(lastLine);
-            step += 1;
-        }
+        createLine(step, lastLine, 1);
+        createLine(step, lastLine, -1);
     }
 
-    private static int[] createLine(int step, int[] last, int side){
+    private static void createLine(int step, int[] last, int side){
         int[] line = new int[4];
         line[0] = last[2];
         line[1] = last[3];
-        int x = (int)(size * sin(StrictMath.toRadians(angle * step)) / step * side);
-        int y = (int)(size * cos(StrictMath.toRadians(angle * step)) / step);
+        int x = (int)(size * sin(StrictMath.toRadians(angle * step)) / ((step + 1) * delta) * side);
+        int y = (int)(size * cos(StrictMath.toRadians(angle * step)) / ((step + 1) * delta));
         line[2] = last[2] + x;
         line[3] = last[3] + y;
 
-        if (sqrt(x * x + y * y) < 5){
-            line[0] = 0;
-            line[1] = 0;
-            line[2] = 0;
-            line[3] = 0;
+        if (sqrt(x * x + y * y) >= stop){
+            linesToDraw.add(line);
+            step += 1;
+            createLine(step, line, side);
+            createLine(step, line, side * -1);
         }
-
-        return line;
     }
 
     private static void drawLines(ArrayList<int[]> listOfLines){
@@ -88,6 +84,7 @@ class LineComponent extends JComponent {
         int height = (int) getPreferredSize().getHeight();
         int width = (int) getPreferredSize().getWidth();
         Line2D.Double line = new Line2D.Double(x1 + width / 2, height -  y1, x2 + width / 2, height - y2);
+
         lines.add(line);
         repaint();
     }
